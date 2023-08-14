@@ -1,0 +1,12 @@
+<html>
+<body>
+<h1>IT 122 Home page</h1>
+
+<h2>Cars!<h2>
+
+<% cars.forEach(function(car) { %>
+<li> <a href="/cars/<%= car.model %>"><%= car.model %> </a></li> 
+<% }); %>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Car Details</title>
+</head>
+<body>
+<% if (car) { %>
+<h1><%= car.model %> Details</h1>
+<ul>
+<li>ID: <%= car.id %></li>
+<li>Model: <%= car.model %></li>
+</ul>
+<% } else { %>
+<p>Cars not found!</p>
+<% } %>
+<a href="/">Back to cars List</a>
+</body>
+</html>
