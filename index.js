@@ -19,6 +19,7 @@ app.get('/cars/:model', (req, res) => {
   console.log(req.url)
   res.render('detail', { car: getItem(req.params.model) });
 });
+
 app.get('/about', (req, res) => {
   console.log(req.url)
   res.send('This class is about making great web sites');
