@@ -13,8 +13,8 @@ app.get('/', (req, res) => {
       res.render('home', { cars })
     })
     .catch(err => next(err));
-
 });
+
 app.get('/cars/:model', (req, res) => {
   console.log(req.url)
   res.render('detail', { car: getItem(req.params.model) });
