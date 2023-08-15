@@ -45,8 +45,8 @@ app.get('/api/cars', async (req, res) => {
   }
 });
 
-//get a single car by id
-app.get('/api/cars/:model', async (req, res) => {
+//get a single car by model
+app.get('/api/car/:model', async (req, res) => {
   try {
     const car = await Car.findOne({ "model": req.params.model });
     if (!car) {
@@ -60,14 +60,14 @@ app.get('/api/cars/:model', async (req, res) => {
   }
 });
 
-// add or update an car
+// add or update a car
 app.post('/api/car', async (req, res) => {
   try {
     const { id, name, make, model, year } = req.body;
-    if (id) {
+    if (model) {
       // update existing car
 
-      const updatedCar = await Car.findBymodelAndUpdate(id, { id, name, make, model, year }, { new: true });
+      const updatedCar = await Car.findByModelAndUpdate(model, { id, name, make, model, year }, { new: true });
       res.json(updatedCar);
     } else {
       // add new Car
@@ -83,7 +83,7 @@ app.post('/api/car', async (req, res) => {
 
 // delete an Car by id
 
-app.delete('/api/cars/:model', async (req, res) => {
+app.delete('/api/car/:model', async (req, res) => {
   try {
     const car = await Car.deleteOne({ "model": req.params.model });
     if (!car) {
