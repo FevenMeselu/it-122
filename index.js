@@ -21,14 +21,6 @@ app.get('/', (req, res) => {
     .catch(err => next(err));
 });
 
-app.get('/', (req, res) => {
-  console.log(req.url)
-  Car.find({}).lean()
-    .then((cars) => {
-      res.render('home', { cars })
-    })
-    .catch(err => next(err));
-});
 
 app.get('/cars/:model', (req, res) => {
   Car.findOne({ "model": req.params.model }).lean()
