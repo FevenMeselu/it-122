@@ -60,14 +60,14 @@ app.get('/api/car/:model', async (req, res) => {
   }
 });
 
-// add or update an car
+// add or update a car
 app.post('/api/car', async (req, res) => {
   try {
     const { id, name, make, model, year } = req.body;
-    if (id) {
+    if (model) {
       // update existing car
 
-      const updatedCar = await Car.findBymodelAndUpdate(id, { id, name, make, model, year }, { new: true });
+      const updatedCar = await Car.findByModelAndUpdate(model, { id, name, make, model, year }, { new: true });
       res.json(updatedCar);
     } else {
       // add new Car

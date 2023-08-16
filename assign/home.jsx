@@ -1,4 +1,6 @@
-<html>
+
+< !DOCTYPE html >
+  <html>
     <head>
       <meta charset="UTF-8" />
       <title>Hello World</title>
@@ -45,6 +47,15 @@ return (
         root.render(<MyApp />);
 
       </script>
-  
+      <!--
+      Note: this page is a great way to try React but it's not suitable for production.
+      It slowly compiles JSX with Babel in the browser and uses a large development build of React.
+
+      Read this page for starting a new React project with JSX:
+      https://react.dev/learn/start-a-new-react-project
+
+      Read this page for adding React with JSX to an existing project:
+      https://react.dev/learn/add-react-to-an-existing-project
+-->
     </body>
-  </html>
+  </html>a

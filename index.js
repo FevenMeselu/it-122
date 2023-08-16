@@ -1,4 +1,6 @@
 import { Car } from "./models/Car.js";
+import React from 'react';
+import ReactDom from 'react-dom/client';
 import express from 'express';
 import { getAll, getItem } from './data.js';
 import cors from 'cors';
@@ -10,6 +12,14 @@ app.set('view engine', 'ejs');
 
 app.use(express.json());
 app.use('/api', cors());
+
+app.get('/', (req, res) => {
+  Car.find({}).lean()
+    .then((cars) => {
+      res.render('home-react', { cars: JSON.stringify(cars) })
+    })
+    .catch(err => next(err));
+});
 
 app.get('/', (req, res) => {
   console.log(req.url)

@@ -1,0 +1,42 @@
+  <html>
+    <head>
+      <meta charset="UTF-8" />
+      <title>HW 5</title>
+      <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+      <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+      <!-- Don't use this in production: -->
+      <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    </head>
+    <body>
+      <h1> IT 201 Web Page</h1>
+      <h2>List of Cars</h1>
+      <div id="root"></div>
+      <script type="text/babel">
+        
+        let items = <%- cars %>;
+
+        const ListItems = (props) => {
+        const ListItems = props.items.map((item) => 
+              <li key={item.model}>
+                <a href={"/cars/" + item.model}> {item.model} </a>
+              </li>
+              );
+          return <ul>{ListItems}</ul>;
+        }
+
+        const CarApp = () => {
+              return (
+                      <div>
+                        <ListItems items={items} />
+                      </div>
+                      )
+              }
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<CarApp />);
+
+      </script>
+    </body>
+  </html>

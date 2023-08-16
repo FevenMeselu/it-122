@@ -37,6 +37,14 @@
         "version": 230,
         "index": 722
       }
+    ],
+    "views/home-react.ejs": [
+      {
+        "id": "3907033d-f78c-4aa5-ac15-35a02a65b46e",
+        "line": 99,
+        "version": 657,
+        "index": 1915
+      }
     ]
   }
 }
