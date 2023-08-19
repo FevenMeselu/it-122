@@ -69,7 +69,7 @@ app.post('/api/car', async (req, res) => {
     if (model) {
       // update existing car
   
-      const updatedCar = await Car.findOneAndUpdate({ make: make }, { id, name, make, model, year }, { new: true });
+      const updatedCar = await Car.findOneAndUpdate({ model: model }, { id, name, make, model, year }, { upsert: true });
       res.json(updatedCar);
     } else {
       // handle create new car
