@@ -1,134 +1,146 @@
-<!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8" />
-<title>IT 122 Homepage</title>
-<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Cars Inventory App</title>
 
-<!-- Don't use this in production: -->
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-<style>
-  button {
-    margin-right: 10px;
-  }
-
-  form {
-    margin-bottom: 10px;
-  }
-
-  input {
-    margin-bottom: 5px;
-  }
-</style>
-
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Don't use this in production: -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
+<h1>IT 122 Home Page</h1>
+  
 <div id="root"></div>
 <script type="text/babel">
 
-const divStyle = {
-color: 'White',
-backgroundColor: 'Green',
-};
+    // return a list of cars
+    const Cars = (props) => {
+        // props is an array
+        const listItems = props.data.map((item) =>
+        <li key={item._id} id={item._id} onClick={props.clickHandler}>
+            {item.model}
+        </li>);
+        return <ul>{listItems}</ul>
+    }
 
-const getItems = () => {
-  let savedItems = JSON.parse(localStorage.getItem('items'));
-  if (!savedItems) {
-    savedItems = [
-      {"name": "Ford", "model": "Focus"},
-      {"name": "BMW", "model": "3 Series"},
-      {"name": "Volvo", "model": "XC90"},
-      {"name": "Volkswagen", "model": "Golf"},
-      {"name": "Toyota", "model": "Camry"},
-    ];
-    localStorage.setItem('items', JSON.stringify(savedItems));
-  }
-  return savedItems;
-}
-
-const ListItems = (props) => {
-const ListItems = props.items.map((item) => <li key={item.name} onClick={props.clickHandler}>{item.name}</li>);
-return <ul>{ListItems}</ul>;
-}
+    const ItemDetail = (props) => {
+        return <div>
+        <hr />
+            <h3>Car Details</h3>
+            <form>
+                Id: <input type="number" name="id" value={props.item.id || ""} onChange={props.handleChange}/><br/>
+                Name: <input type="text" name="name" value={props.item.name || ""} onChange={props.handleChange}/><br/>
+                Model: <input type="text" name="model" value={props.item.model || ""} onChange={props.handleChange} /><br/>
+                Year: <input type="number" name="year" value={props.item.year || ""} onChange={props.handleChange} /><br/>
+            </form>
+            <button name="save" onClick={props.saveItem}>Save</button>&nbsp;
+            <button name="clear" onClick={props.clearForm}>Clear</button>&nbsp;
+            <button name="delete" onClick={props.deleteItem}>Delete</button>&nbsp;
+        </div>
+    }
 
 
-const Detail = (props) => {
-return (
-<div>
-<h3>Car Details</h3>
-{props.item &&
-<form>
-<b>Name</b>: <input type="text" name="name" onChange={props.changeHandler} value={props.item.name ||''} />
-<br />
-<b>Model</b>: <input type="text" name="model" onChange={props.changeHandler} value={props.item.model ||''} />
-</form>
-}
-<button onClick={props.saveHandler}>Save</button>
-<button onClick={props.deleteHandler}>Delete</button>
-</div> 
-)
-}
+    const CarApp = (props) => {
+        const [items, setItems] = React.useState([]);
+        const [currentItem, setCurrentItem] = React.useState({});
 
-//this is the parent component
-const MyApp = () => {
+        // load data after component has rendered
+        React.useEffect(() => {
+            const fetchData = async () => {
+                fetch("/api/cars").then(res => res.json())
+                .then((json) => {
+                    setItems(json);
+                })
+            }
+            fetchData()
+        }, []);
 
-const [items, setItems] = React.useState(getItems());
-const [selectedItem, setSelectedItem] = React.useState();
+        // list click event handler
+        const selectItem = (event) => {
+            const found = items.find((item) => {
+                return item._id === event.target.id;
+            });
+            setCurrentItem(found);
+        }
 
-const itemClicked = (e) => {
-let found = items.find((item) => {return item.name == e.target.innerText});
-setSelectedItem(found);
-}
+        const clearForm = () => {
+            setCurrentItem({});
+        }
 
-const itemChanged = (e) => {
-let field = e.target.name;
-let newItem = {...selectedItem };
-newItem[field] = e.target.value;
+        const saveItem = () => {
+            if (!currentItem.model) {
+              return;
+            }
+            fetch("/api/car/", {
+              method: "POST",
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(currentItem)
+            })
+            .then(res => res.json())
+            .then((data) => {
+                // if item has no _id, it wasn't previously saved in DB
+                if (!currentItem._id) {
+                    currentItem._id = data._id;
+                    setCurrentItem(currentItem);
+                    // update items list
+                    let newItems = [...items];
+                    newItems.push(currentItem);
+                    setItems(newItems);
+                }
+            })
+        }
 
-let newItems = items.filter(item => item.name != newItem.name)
-console.log(newItems)
-setSelectedItem(newItem);
-}
+        const deleteItem = () => {
+            let model = currentItem.model;
+            // delete item from DB
+            fetch(`/api/car/${model}`)
+            .then(res => res.json())
+            .then((data) => {
+                // remove item from UI list
+                  const newItems = items.filter((item) => {
+                    return item.model !== model;
+                  });
+              setItems(newItems);
+              // clear form
+              setCurrentItem({})
+            });
+        }
 
-const saveItem = () => {
-//find index of selected item
-let index = items.findIndex(item => item.name === selectedItem.name)
+        // update list state
+        const handleChange = (event) => {
+          let newItem = { ...currentItem } ;
+          newItem[event.target.name] = event.target.value;
+          // update currentItem state
+          setCurrentItem(newItem);
+          // update list state
+          items.find((item, index) => {
+            if (item._id == newItem._id) {
+                items[index] = newItem;
+                setItems(items);
+            }
+          })
+        }
 
-//create new array with updated item
-let newItems = [...items];
-newItems[index] = selectedItem;
+        return (
+            <div> <h2>Cars Inventory</h2>
+                <Cars data={items} clickHandler={selectItem} />
+                <ItemDetail
+                  item={currentItem}
+                  handleChange={handleChange}
+                  clearForm={clearForm}
+                  saveItem={saveItem}
+                  deleteItem={deleteItem}
+                />
+            </div>
+        );
 
-//setItems(newItems);
-localStorage.setItem('items', JSON.stringify(newItems));
-setItems(getItems());
-}
+    }
 
-const deleteItem = () => {
-//create new array without selected item
-let newItems = items.filter(item => item.name !== selectedItem.name);
-
-//setSelectedItem(null);
-//setItems(newItems);
-localStorage.setItem('items', JSON.stringify(newItems));
-setItems(getItems());
-setSelectedItem(null);
-}
-
-return (
-<div>
-<h2>Car description!</h2>
-<ListItems items={items} clickHandler={itemClicked}/>
-<hr />
-<Detail item={selectedItem} changeHandler={itemChanged} saveHandler={saveItem} deleteHandler={deleteItem} />
-</div>
-)
-}
-
-const container = document.getElementById('root');
-const root = ReactDOM.createRoot(container);
-root.render(<MyApp />);
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render( <CarApp />);
 
 </script>
 </body>
