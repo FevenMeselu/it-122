@@ -1,89 +1,93 @@
-<!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8" />
-<title>IT 122 Homepage</title>
-<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>React App Car</title>
 
-<!-- Don't use this in production: -->
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Don't use this in production: -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
+<h1>IT 122 Home Page</h1>
+
 <div id="root"></div>
 <script type="text/babel">
 
-const divStyle = {
-color: 'White',
-backgroundColor: 'Green',
-};
+    // return a list of cars
+    const Cars = (props) => {
+        // props is an array
+        const listItems = props.data.map((item) =>
+        <li key={item._id} id={item._id} onClick={props.clickHandler}>
+            {item.model}
+        </li>);
+        return <ul>{listItems}</ul>
+    }
 
-const cars = [
-  {"name": "Ford", "model": "Focus"},
-  {"name": "BMW", "model": "3 Series"},
-  {"name": "Volvo", "model": "XC90"},
-  {"name": "Volkswagen", "model": "Golf"},
-  {"name": "Toyota", "model": "Camry"},
-];
-
-
-const ListItems = (props) => {
-const ListItems = props.items.map((item) => <li key={item.model} onClick={props.clickHandler}>{item.model}</li>);
-return <ul>{ListItems}</ul>;
-}
-
-
-const Detail = (props) => {
-return (
-<div>
-<h3>Car Details</h3>
-{props.item &&
-<form>
-<b>Name</b>: <input type="text" name="name" onChange={props.changeHandler} value={props.item.name || ''} />
-<b>Model</b>: <input type="text" name="model" onChange={props.changeHandler} value={props.item.model ||''} /> &nbsp;
-
-<button name="clear" onClick={props.clearForm}>Clear</button>&nbsp;
-</form>
-}
-</div> 
-)
-}
-
-//this is the parent component
-const CarApp = () => {
-
-const [items, setItems] = React.useState(cars);
-const [selectedItem, setSelectedItem] = React.useState();
-
-const itemClicked = (e) => {
-let found = cars.find((item) => {return item.model == e.target.innerText});
-setSelectedItem(found);
-}
-
-const itemChanged = (e) => {
-let field = e.target.name;
-let newItem = {...selectedItem };
-newItem[field] = e.target.value;
-
-let newItems = items.filter(item => item.model != newItem.model)
-console.log(newItems)
-setSelectedItem(newItem);
-}
+    const ItemDetail = (props) => {
+        return <div>
+        <hr />
+            <h3>Car Details</h3>
+            <form>
+                Name: <input type="text" name="name" value={props.item.name || ""} onChange={props.handleChange} /><br/>
+                Model: <input type="text" name="model" value={props.item.model || ""} onChange={props.handleChange}/><br/>
+                Year: <input type="text" name="year" value={props.item.year || ""} onChange={props.handleChange}/><br/>
+                
+            </form>
+            <button name="clear" onClick={props.clearForm}>Clear</button>&nbsp;
+        </div>
+    }
 
 
-return (
-<div>
-<h2>Car Inventory!</h2>
-<ListItems items={items} clickHandler={itemClicked}/>
-<hr />
-<Detail item={selectedItem} changeHandler={itemChanged} />
-</div>
-)
-}
+    const CarApp = (props) => {
+        const [items, setItems] = React.useState(<%- cars %>);
+        const [currentItem, setCurrentItem] = React.useState({});
 
-const container = document.getElementById('root');
-const root = ReactDOM.createRoot(container);
-root.render(<CarApp />);
+        // list click event handler
+        const selectItem = (event) => {
+            const found = items.find((item) => {
+              console.log(item);
+                return item.model === event.target.innerText;
+            });
+            setCurrentItem(found);
+        }
+
+        const clearForm = () => {
+            setCurrentItem({});
+        }
+
+        // update list state
+        const handleChange = (event) => {
+          let newItem = { ...currentItem } ;
+          newItem[event.target.model] = event.target.value;
+          // update currentItem state
+          setCurrentItem(newItem);
+          // update list state
+          items.find((item, index) => {
+            if (item._id == newItem._id) {
+                items[index] = newItem;
+                setItems(items);
+            }
+          })
+        }
+
+        return (
+            <div> <h2>Cars Inventory</h2>
+                <Cars data={items} clickHandler={selectItem} />
+                <ItemDetail
+                  item={currentItem}
+                  handleChange={handleChange}
+                  clearForm={clearForm}
+                />
+            </div>
+        );
+
+    }
+
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render( <CarApp />);
 
 </script>
 </body>
