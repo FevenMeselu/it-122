@@ -39,10 +39,8 @@ return (
 <h3>Car Details</h3>
 {props.item &&
 <form>
+<b>Model</b>: <input type="text" name="model" onChange={props.changeHandler} value={props.item.model ||''} />
 <b>Name</b>: <input type="text" name="name" onChange={props.changeHandler} value={props.item.name || ''} />
-<b>Model</b>: <input type="text" name="model" onChange={props.changeHandler} value={props.item.model ||''} /> &nbsp;
-
-<button name="clear" onClick={props.clearForm}>Clear</button>&nbsp;
 </form>
 }
 </div> 
@@ -50,7 +48,7 @@ return (
 }
 
 //this is the parent component
-const CarApp = () => {
+const MyApp = () => {
 
 const [items, setItems] = React.useState(cars);
 const [selectedItem, setSelectedItem] = React.useState();
@@ -83,7 +81,7 @@ return (
 
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
-root.render(<CarApp />);
+root.render(<MyApp />);
 
 </script>
 </body>

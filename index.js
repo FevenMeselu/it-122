@@ -5,6 +5,7 @@ import express from 'express';
 import { getAll, getItem } from './data.js';
 import cors from 'cors';
 
+
 const app = express();
 app.set('port', process.env.PORT || 3000);
 app.use(express.static('public'));
@@ -68,8 +69,8 @@ app.post('/api/car', async (req, res) => {
     const { id, name, make, model, year } = req.body;
     if (model) {
       // update existing car
-  
-      const updatedCar = await Car.findOneAndUpdate({ make: make }, { id, name, make, model, year }, { new: true });
+
+      const updatedCar = await Car.findOneAndUpdate({ model: model }, { id, name, make, model, year }, { upsert: true });
       res.json(updatedCar);
     } else {
       // handle create new car

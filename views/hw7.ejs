@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>IT 122 Homepage</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+<!-- Don't use this in production: -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<style>
+  button {
+    margin-right: 10px;
+  }
+
+  form {
+    margin-bottom: 10px;
+  }
+
+  input {
+    margin-bottom: 5px;
+  }
+</style>
+
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const divStyle = {
+color: 'White',
+backgroundColor: 'Green',
+};
+
+const getItems = () => {
+  let savedItems = JSON.parse(localStorage.getItem('items'));
+  if (!savedItems) {
+    savedItems = [
+      {"name": "Ford", "model": "Focus"},
+      {"name": "BMW", "model": "3 Series"},
+      {"name": "Volvo", "model": "XC90"},
+      {"name": "Volkswagen", "model": "Golf"},
+      {"name": "Toyota", "model": "Camry"},
+    ];
+    localStorage.setItem('items', JSON.stringify(savedItems));
+  }
+  return savedItems;
+}
+
+const ListItems = (props) => {
+const ListItems = props.items.map((item) => <li key={item.name} onClick={props.clickHandler}>{item.name}</li>);
+return <ul>{ListItems}</ul>;
+}
+
+
+const Detail = (props) => {
+return (
+<div>
+<h3>Car Details</h3>
+{props.item &&
+<form>
+<b>Name</b>: <input type="text" name="name" onChange={props.changeHandler} value={props.item.name ||''} />
+<br />
+<b>Model</b>: <input type="text" name="model" onChange={props.changeHandler} value={props.item.model ||''} />
+</form>
+}
+<button onClick={props.saveHandler}>Save</button>
+<button onClick={props.deleteHandler}>Delete</button>
+</div> 
+)
+}
+
+//this is the parent component
+const MyApp = () => {
+
+const [items, setItems] = React.useState(getItems());
+const [selectedItem, setSelectedItem] = React.useState();
+
+const itemClicked = (e) => {
+let found = items.find((item) => {return item.name == e.target.innerText});
+setSelectedItem(found);
+}
+
+const itemChanged = (e) => {
+let field = e.target.name;
+let newItem = {...selectedItem };
+newItem[field] = e.target.value;
+
+let newItems = items.filter(item => item.name != newItem.name)
+console.log(newItems)
+setSelectedItem(newItem);
+}
+
+const saveItem = () => {
+//find index of selected item
+let index = items.findIndex(item => item.name === selectedItem.name)
+
+//create new array with updated item
+let newItems = [...items];
+newItems[index] = selectedItem;
+
+//setItems(newItems);
+localStorage.setItem('items', JSON.stringify(newItems));
+setItems(getItems());
+}
+
+const deleteItem = () => {
+//create new array without selected item
+let newItems = items.filter(item => item.name !== selectedItem.name);
+
+//setSelectedItem(null);
+//setItems(newItems);
+localStorage.setItem('items', JSON.stringify(newItems));
+setItems(getItems());
+setSelectedItem(null);
+}
+
+return (
+<div>
+<h2>Car description!</h2>
+<ListItems items={items} clickHandler={itemClicked}/>
+<hr />
+<Detail item={selectedItem} changeHandler={itemChanged} saveHandler={saveItem} deleteHandler={deleteItem} />
+</div>
+)
+}
+
+const container = document.getElementById('root');
+const root = ReactDOM.createRoot(container);
+root.render(<MyApp />);
+
+</script>
+</body>
+</html>
